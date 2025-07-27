@@ -117,7 +117,7 @@ export default function SupabasePlayground() {
   }
 
   return (
-    <div className="h-screen flex flex-col max-w-5xl mx-auto">
+    <div className="h-screen flex flex-col max-w-5xl lg:max-w-7xl mx-auto">
       <div className="flex-shrink-0 w-full p-6 pb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -133,173 +133,174 @@ export default function SupabasePlayground() {
         </div>
       </div>
 
-      {/* Tabs Section - Fixed */}
-      <div className="flex-shrink-0 w-full px-6">
-        <Tabs defaultValue="query" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="query">
-              <Braces className="size-4" />
-              <p>Database Query</p>
-            </TabsTrigger>
-            <TabsTrigger value="rpc">
-              <SquareFunction className="size-4" />
-              <p>RPC Function</p>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="query" className="space-y-4 mt-4">
-            <div>
-              <label htmlFor="query-textarea" className="block text-sm font-medium mb-2">
-                Supabase JS Query
-              </label>
-              <Textarea
-                id="query-textarea"
-                value={queryCode}
-                onChange={(e) => setQueryCode(e.target.value)}
-                placeholder="Enter your Supabase query here... Example: await supabase.from('characters').select()"
-                className="font-mono text-sm min-h-32"
-              />
-            </div>
-            <div className='flex justify-end items-center gap-4'>
-              {shouldShowKeyToggle && (
-                <div className="flex items-center gap-2">
+      <section className='flex flex-col lg:flex-row'>
+         <div className={'w-full px-6 lg:w-1/2'}>
+          <Tabs defaultValue="query" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="query">
+                <Braces className="size-4" />
+                <p>Database Query</p>
+              </TabsTrigger>
+              <TabsTrigger value="rpc">
+                <SquareFunction className="size-4" />
+                <p>RPC Function</p>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="query" className="space-y-4 mt-4">
+              <div>
+                <label htmlFor="query-textarea" className="block text-sm font-medium mb-2">
+                  Supabase JS Query
+                </label>
+                <Textarea
+                  id="query-textarea"
+                  value={queryCode}
+                  onChange={(e) => setQueryCode(e.target.value)}
+                  placeholder="Enter your Supabase query here... Example: await supabase.from('characters').select()"
+                  className="font-mono text-sm min-h-32"
+                />
+              </div>
+              <div className='flex justify-end items-center gap-4'>
+                {shouldShowKeyToggle && (
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <Key className="size-3" />
-                      <span>Anon</span>
-                    </div>
-                    <Switch
-                      checked={useServiceKey}
-                      onCheckedChange={setUseServiceKey}
-                    />
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <ShieldCheck className="size-3" />
-                      <span>Service</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Key className="size-3" />
+                        <span>Anon</span>
+                      </div>
+                      <Switch
+                        checked={useServiceKey}
+                        onCheckedChange={setUseServiceKey}
+                      />
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <ShieldCheck className="size-3" />
+                        <span>Service</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <Button 
-                onClick={executeQuery} 
-                disabled={loading}
-                className="w-32"
-                size="sm"
-              >
-                {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
-                <p>{loading ? 'Running...' : 'Run Query'}</p>
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="rpc" className="space-y-4 mt-4">
-            <div>
-              <label htmlFor="rpc-textarea" className="block text-sm font-medium mb-2">
-                RPC Function Call
-              </label>
-              <Textarea
-                id="rpc-textarea"
-                value={rpcCode}
-                onChange={(e) => setRpcCode(e.target.value)}
-                placeholder="Enter your RPC function here..."
-                className="font-mono text-sm h-32"
-              />
-            </div>
-            <div className='flex justify-end items-center gap-4'>
-              {shouldShowKeyToggle && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <Key className="size-3" />
-                      <span>Anon</span>
-                    </div>
-                    <Switch
-                      checked={useServiceKey}
-                      onCheckedChange={setUseServiceKey}
-                    />
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <ShieldCheck className="size-3" />
-                      <span>Service</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <Button 
-                onClick={executeRpc} 
-                disabled={loading}
-                className="w-32 flex items-center gap-2"
-                size="sm"
-              >
-                {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
-                <p>{loading ? 'Running...' : 'Run RPC'}</p>
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      <div className="flex-1 w-full p-6 pt-4 flex flex-col min-h-0">
-        <div className="border rounded-lg flex flex-col h-full">
-          <div className="flex-shrink-0 p-4 border-b">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold flex items-center gap-1">
-                <DatabaseZap className="size-4" />
-                <p>Results</p>
-              </h3>
-              {(results || error) && (
-                <Button
-                  variant="outline"
+                )}
+                <Button 
+                  onClick={executeQuery} 
+                  disabled={loading}
+                  className="w-32"
                   size="sm"
-                  onClick={clearResults}
-                  className="flex items-center gap-1"
                 >
-                  <X className="size-3" />
-                  Clear
+                  {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+                  <p>{loading ? 'Running...' : 'Run Query'}</p>
                 </Button>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="rpc" className="space-y-4 mt-4">
+              <div>
+                <label htmlFor="rpc-textarea" className="block text-sm font-medium mb-2">
+                  RPC Function Call
+                </label>
+                <Textarea
+                  id="rpc-textarea"
+                  value={rpcCode}
+                  onChange={(e) => setRpcCode(e.target.value)}
+                  placeholder="Enter your RPC function here..."
+                  className="font-mono text-sm h-32"
+                />
+              </div>
+              <div className='flex justify-end items-center gap-4'>
+                {shouldShowKeyToggle && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Key className="size-3" />
+                        <span>Anon</span>
+                      </div>
+                      <Switch
+                        checked={useServiceKey}
+                        onCheckedChange={setUseServiceKey}
+                      />
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <ShieldCheck className="size-3" />
+                        <span>Service</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <Button 
+                  onClick={executeRpc} 
+                  disabled={loading}
+                  className="w-32 flex items-center gap-2"
+                  size="sm"
+                >
+                  {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+                  <p>{loading ? 'Running...' : 'Run RPC'}</p>
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <div className={'w-full p-6 lg:pt-0 pt-4 flex flex-col lg:w-1/2'}>
+          <div className="border rounded-lg flex flex-col h-full">
+            <div className="flex-shrink-0 p-4 border-b">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold flex items-center gap-1">
+                  <DatabaseZap className="size-4" />
+                  <p>Results</p>
+                </h3>
+                {(results || error) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearResults}
+                    className="flex items-center gap-1"
+                  >
+                    <X className="size-3" />
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex-1 p-4 overflow-auto">
+              {loading && (
+                <div className="text-muted-foreground">Executing...</div>
+              )}
+              
+              {error && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
+                  <div className="text-destructive text-sm font-medium">Error:</div>
+                  <pre className="text-destructive text-sm mt-1 whitespace-pre-wrap">{error}</pre>
+                </div>
+              )}
+              
+              {results && !loading && !error && (
+                <div className="bg-muted/50 rounded-md p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-medium">Response:</div>
+                    {results.data && Array.isArray(results.data) && (
+                      <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
+                        {results.data.length} {results.data.length === 1 ? 'result' : 'results'}
+                      </div>
+                    )}
+                    {results.count !== undefined && (
+                      <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
+                        {results.count} {results.count === 1 ? 'result' : 'results'}
+                      </div>
+                    )}
+                  </div>
+                  <pre className="text-sm bg-background p-3 rounded border whitespace-pre-wrap break-words overflow-hidden">
+                    {JSON.stringify(results, null, 2)}
+                  </pre>
+                </div>
+              )}
+              
+              {!results && !loading && !error && (
+                <div className="text-muted-foreground text-sm">
+                  Run a query or RPC function to see results here
+                </div>
               )}
             </div>
-          </div>
-          
-          <div className="flex-1 p-4 overflow-auto">
-            {loading && (
-              <div className="text-muted-foreground">Executing...</div>
-            )}
-            
-            {error && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
-                <div className="text-destructive text-sm font-medium">Error:</div>
-                <pre className="text-destructive text-sm mt-1 whitespace-pre-wrap">{error}</pre>
-              </div>
-            )}
-            
-            {results && !loading && !error && (
-              <div className="bg-muted/50 rounded-md p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-medium">Response:</div>
-                  {results.data && Array.isArray(results.data) && (
-                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
-                      {results.data.length} {results.data.length === 1 ? 'result' : 'results'}
-                    </div>
-                  )}
-                  {results.count !== undefined && (
-                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
-                      {results.count} {results.count === 1 ? 'result' : 'results'}
-                    </div>
-                  )}
-                </div>
-                <pre className="text-sm bg-background p-3 rounded border whitespace-pre-wrap break-words overflow-hidden">
-                  {JSON.stringify(results, null, 2)}
-                </pre>
-              </div>
-            )}
-            
-            {!results && !loading && !error && (
-              <div className="text-muted-foreground text-sm">
-                Run a query or RPC function to see results here
-              </div>
-            )}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 } 
