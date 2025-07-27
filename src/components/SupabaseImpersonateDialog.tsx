@@ -193,7 +193,6 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
         )}
         
         {impersonatedUserFromSession ? (
-          // Show current impersonation status and stop button
           <div className="grid gap-4 py-4">
             <div className="bg-orange-50 border border-orange-200 rounded-md p-4">
               <div className="flex items-center justify-between">
