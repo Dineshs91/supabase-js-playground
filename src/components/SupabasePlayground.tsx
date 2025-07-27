@@ -117,12 +117,12 @@ export default function SupabasePlayground() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-shrink-0 max-w-4xl mx-auto w-full p-6 pb-4">
+    <div className="h-screen flex flex-col max-w-5xl mx-auto">
+      <div className="flex-shrink-0 w-full p-6 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Supabase JS Playground</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold">Supabase JS Playground</h1>
+            <p className="text-muted-foreground text-sm">
               Test your Supabase queries and RPC calls in real-time
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function SupabasePlayground() {
       </div>
 
       {/* Tabs Section - Fixed */}
-      <div className="flex-shrink-0 max-w-4xl mx-auto w-full px-6">
+      <div className="flex-shrink-0 w-full px-6">
         <Tabs defaultValue="query" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="query">
@@ -237,7 +237,7 @@ export default function SupabasePlayground() {
         </Tabs>
       </div>
 
-      <div className="flex-1 max-w-4xl mx-auto w-full p-6 pt-4 flex flex-col min-h-0">
+      <div className="flex-1 w-full p-6 pt-4 flex flex-col min-h-0">
         <div className="border rounded-lg flex flex-col h-full">
           <div className="flex-shrink-0 p-4 border-b">
             <div className="flex items-center justify-between">
