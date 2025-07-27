@@ -24,12 +24,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <script
-        src={process.env.NEXT_PUBLIC_ANALYTICS_URL}
-        data-token={process.env.NEXT_PUBLIC_ANALYTICS_TOKEN}
-        async
-      >
-      </script>
+      <head>
+        <script
+          src={process.env.NEXT_PUBLIC_ANALYTICS_URL}
+          data-token={process.env.NEXT_PUBLIC_ANALYTICS_TOKEN}
+          async
+        >
+        </script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
