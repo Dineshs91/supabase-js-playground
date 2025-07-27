@@ -167,7 +167,19 @@ export default function SupabasePlayground() {
             
             {results && !loading && !error && (
               <div className="bg-muted/50 rounded-md p-3">
-                <div className="text-sm font-medium mb-2">Response:</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-medium">Response:</div>
+                  {results.data && Array.isArray(results.data) && (
+                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
+                      {results.data.length} {results.data.length === 1 ? 'result' : 'results'}
+                    </div>
+                  )}
+                  {results.count !== undefined && (
+                    <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
+                      {results.count} {results.count === 1 ? 'result' : 'results'}
+                    </div>
+                  )}
+                </div>
                 <pre className="text-sm bg-background p-3 rounded border whitespace-pre-wrap break-words overflow-hidden">
                   {JSON.stringify(results, null, 2)}
                 </pre>
