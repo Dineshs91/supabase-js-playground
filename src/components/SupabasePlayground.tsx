@@ -68,7 +68,7 @@ export default function SupabasePlayground() {
       }
       
       // Execute the RPC call
-      const result = await eval(`supabase${code}`)
+      const result = await eval(`supabase.rpc('${code}')`)
       setResults(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
