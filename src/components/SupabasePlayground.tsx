@@ -158,7 +158,7 @@ export default function SupabasePlayground() {
                     value={queryCode}
                     onChange={(e) => setQueryCode(e.target.value)}
                     placeholder="Enter your Supabase query here... Example: await supabase.from('characters').select()"
-                    className="font-mono text-sm min-h-32 text-gray-800"
+                    className="font-mono text-sm min-h-16 lg:min-h-32 text-gray-800"
                   />
                 </div>
                 <div className='flex justify-end items-center gap-4'>
@@ -202,7 +202,7 @@ export default function SupabasePlayground() {
                     value={rpcCode}
                     onChange={(e) => setRpcCode(e.target.value)}
                     placeholder="Enter your RPC function here..."
-                    className="font-mono text-sm h-32 text-gray-800"
+                    className="font-mono text-sm h-16 lg:h-32 text-gray-800"
                   />
                 </div>
                 <div className='flex justify-end items-center gap-4'>
