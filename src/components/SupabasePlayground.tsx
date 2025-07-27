@@ -125,7 +125,7 @@ export default function SupabasePlayground() {
   return (
     <main className='h-screen py-4 flex flex-col'>
       <div className="w-full px-6 flex-shrink-0">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
           <div>
             <h1 className="text-xl font-bold">Supabase JS Playground</h1>
             <p className="text-muted-foreground text-sm">
@@ -255,7 +255,7 @@ export default function SupabasePlayground() {
               backgroundImage: 'repeating-linear-gradient(-50deg, transparent, transparent 7px, rgba(0,0,0,0.04) 7px, rgba(0,0,0,0.04) 8px)'
             }}
           >
-            <div className="border rounded-lg flex flex-col my-2 lg:my-4 h-[45vh] lg:h-[78vh] bg-white">
+            <div className="border rounded-lg flex flex-col my-2 lg:my-4 h-[38vh] lg:h-[78vh] bg-white">
               <div className="flex-shrink-0 px-4 py-2 border-b shadow-xs">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold flex items-center gap-1">
