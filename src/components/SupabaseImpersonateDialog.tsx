@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { UserRoundCog } from 'lucide-react'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createSupabaseClient, supabase } from '@/lib/supabase'
 
 interface SupabaseImpersonateDialogProps {
   onImpersonationChange: (userEmail?: string) => void
@@ -25,6 +25,23 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null)
+  const [impersonatedUserFromSession, setImpersonatedUserFromSession] = useState<any>(null)
+
+  useEffect(() => {
+    const updateUser = async() => {
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log("Session: ", session)
+      setImpersonatedUserFromSession(session?.user || null)
+    }
+
+    updateUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setImpersonatedUserFromSession(session?.user || null)
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
 
   const handleImpersonate = async () => {
     if (!email) return
@@ -75,6 +92,16 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
         throw new Error('No user or session returned from verification')
       }
       
+      // Step 4: Set the session for the impersonated user
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: authData.session.access_token,
+        refresh_token: authData.session.refresh_token
+      })
+      
+      if (sessionError) {
+        throw new Error(`Failed to set session: ${sessionError.message}`)
+      }
+      
       // Store the impersonated user info
       setImpersonatedUser(email)
       
@@ -93,12 +120,13 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
 
   const handleStopImpersonation = async () => {
     try {
-      const supabase = createSupabaseClient()
       await supabase.auth.signOut()
       setImpersonatedUser(null)
+      setImpersonatedUserFromSession(null)
       onImpersonationChange()
     } catch (err) {
       console.error('Error stopping impersonation:', err)
+      setError(err instanceof Error ? err.message : 'Failed to stop impersonation')
     }
   }
 
@@ -114,35 +142,35 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button 
-          variant={impersonatedUser ? "default" : "outline"} 
+          variant={impersonatedUserFromSession ? "default" : "outline"} 
           size="sm"
-          className={impersonatedUser ? "bg-orange-600 hover:bg-orange-700" : ""}
+          className={impersonatedUserFromSession ? "bg-orange-600 hover:bg-orange-700" : ""}
         >
           <UserRoundCog className="h-4 w-4 mr-2" />
-          {impersonatedUser ? `Impersonating: ${impersonatedUser}` : 'Impersonate User'}
+          {impersonatedUserFromSession ? `Impersonating: ${impersonatedUserFromSession.email}` : 'Impersonate User'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {impersonatedUser ? 'User Impersonation Active' : 'Impersonate User'}
+            {impersonatedUserFromSession ? 'User Impersonation Active' : 'Impersonate User'}
           </DialogTitle>
           <DialogDescription>
-            {impersonatedUser 
-              ? `You are currently impersonating ${impersonatedUser}. You can stop the impersonation or switch to a different user.`
+            {impersonatedUserFromSession 
+              ? `You are currently impersonating ${impersonatedUserFromSession.email}. You can stop the impersonation or switch to a different user.`
               : 'Enter the email address of the user you want to impersonate. This will use admin privileges to generate a session for that user.'
             }
           </DialogDescription>
         </DialogHeader>
         
-        {impersonatedUser ? (
+        {impersonatedUserFromSession ? (
           // Show current impersonation status and stop button
           <div className="grid gap-4 py-4">
             <div className="bg-orange-50 border border-orange-200 rounded-md p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm font-medium text-orange-900">Currently Impersonating</div>
-                  <div className="text-sm text-orange-700 font-mono">{impersonatedUser}</div>
+                  <div className="text-sm text-orange-700 font-mono">{impersonatedUserFromSession.email}</div>
                 </div>
                 <UserRoundCog className="h-5 w-5 text-orange-600" />
               </div>
@@ -198,7 +226,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
         )}
         
         <DialogFooter className="gap-2">
-          {impersonatedUser && (
+          {impersonatedUserFromSession && (
             <Button
               variant="outline"
               onClick={() => {
@@ -211,13 +239,13 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
             </Button>
           )}
           
-          {(!impersonatedUser || email) && (
+          {(!impersonatedUserFromSession || email) && (
             <Button
               type="submit"
               onClick={handleImpersonate}
               disabled={!email || loading}
             >
-              {loading ? 'Impersonating...' : impersonatedUser ? 'Switch User' : 'Impersonate User'}
+              {loading ? 'Impersonating...' : impersonatedUserFromSession ? 'Switch User' : 'Impersonate User'}
             </Button>
           )}
         </DialogFooter>

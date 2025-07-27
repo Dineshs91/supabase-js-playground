@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { createSupabaseClient } from '@/lib/supabase'
+import { createSupabaseClient, supabase } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Input } from './ui/input'
@@ -18,6 +18,24 @@ export default function SupabasePlayground() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+
+  useEffect(() => {
+    const updateCurrentUser = async() => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setCurrentUser(session?.user || null)
+    }
+    
+    // Initial session check
+    updateCurrentUser()
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setCurrentUser(session?.user || null)
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
 
   // Function to refresh Supabase client when credentials change
   const handleCredentialsChange = () => {
@@ -97,11 +115,6 @@ export default function SupabasePlayground() {
             <h1 className="text-3xl font-bold mb-2">Supabase JS Playground</h1>
             <p className="text-muted-foreground">
               Test your Supabase queries and RPC calls in real-time
-              {impersonatedUser && (
-                <span className="ml-2 text-orange-600 font-medium">
-                  • Impersonating: {impersonatedUser}
-                </span>
-              )}
             </p>
           </div>
           <div className="flex items-center gap-2">
