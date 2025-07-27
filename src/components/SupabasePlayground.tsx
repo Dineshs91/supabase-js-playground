@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { createSupabaseClient } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
+import { Input } from './ui/input'
 
 export default function SupabasePlayground() {
   const [queryCode, setQueryCode] = useState('')
@@ -103,7 +104,7 @@ export default function SupabasePlayground() {
           <TabsContent value="query" className="space-y-4 mt-4">
             <div>
               <label htmlFor="query-textarea" className="block text-sm font-medium mb-2">
-                Supabase Query
+                Supabase JS Query
               </label>
               <Textarea
                 id="query-textarea"
@@ -127,12 +128,12 @@ export default function SupabasePlayground() {
               <label htmlFor="rpc-textarea" className="block text-sm font-medium mb-2">
                 RPC Function Call
               </label>
-              <Textarea
+              <Input
                 id="rpc-textarea"
                 value={rpcCode}
                 onChange={(e) => setRpcCode(e.target.value)}
                 placeholder="Enter your RPC function here..."
-                className="font-mono text-sm min-h-32"
+                className="font-mono text-sm"
               />
             </div>
             <Button 
