@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { createSupabaseClient, supabase, hasServiceKey } from '@/lib/supabase'
+import { createSupabaseClient, supabase, hasServiceKey, hasAnonKey } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Braces, DatabaseZap, Loader2, Play, SquareFunction, X, Key, ShieldCheck } from 'lucide-react'
@@ -28,6 +28,7 @@ export default function SupabasePlayground() {
   const [error, setError] = useState<string | null>(null)
   const [useServiceKey, setUseServiceKey] = useState(false)
   const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
+  const [anonKeyAvailable, setAnonKeyAvailable] = useState(false)
   const [isImpersonating, setIsImpersonating] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const [activeTab, setActiveTab] = useState('query')
@@ -37,6 +38,7 @@ export default function SupabasePlayground() {
 
     const checkKeyAvailability = () => {
       setServiceKeyAvailable(hasServiceKey())
+      setAnonKeyAvailable(hasAnonKey())
     }
     
     const checkImpersonationStatus = async () => {
@@ -55,12 +57,13 @@ export default function SupabasePlayground() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const shouldShowKeyToggle = serviceKeyAvailable && !isImpersonating
+  const shouldShowKeyToggle = serviceKeyAvailable && anonKeyAvailable && !isImpersonating
 
   const handleCredentialsChange = () => {
     setResults(null)
     setError(null)
     setServiceKeyAvailable(hasServiceKey())
+    setAnonKeyAvailable(hasAnonKey())
   }
 
   const handleImpersonationChange = () => {

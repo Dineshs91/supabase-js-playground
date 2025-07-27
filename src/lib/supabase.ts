@@ -50,5 +50,12 @@ export function hasServiceKey() {
   return !!(serviceKey && serviceKey !== defaultSupabaseServiceKey)
 }
 
+// Check if anon key is available
+export function hasAnonKey() {
+  if (typeof window === 'undefined') return false
+  const anonKey = localStorage.getItem('supabase-anon-key')
+  return !!(anonKey && anonKey !== defaultSupabaseAnonKey)
+}
+
 // Default export for immediate use (using anon key)
 export const supabase = createSupabaseClient() 
