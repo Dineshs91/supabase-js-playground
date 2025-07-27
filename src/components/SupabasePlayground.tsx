@@ -10,6 +10,7 @@ import { createSupabaseClient, supabase, hasServiceKey } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Braces, DatabaseZap, Loader2, Play, SquareFunction, X, Key, ShieldCheck } from 'lucide-react'
+import { useHotkeys } from 'react-hotkeys-hook';
 
 // Dynamically import ReactJsonView to avoid SSR issues
 const ReactJsonView = dynamic(() => import('@microlink/react-json-view'), {
@@ -29,6 +30,7 @@ export default function SupabasePlayground() {
   const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
   const [isImpersonating, setIsImpersonating] = useState(false)
   const [isClient, setIsClient] = useState(false)
+  const [activeTab, setActiveTab] = useState('query')
 
   useEffect(() => {
     setIsClient(true)
@@ -122,6 +124,21 @@ export default function SupabasePlayground() {
     }
   }
 
+  // Add keyboard shortcuts for cmd/ctrl + enter
+  useHotkeys('meta+enter, ctrl+enter', (event) => {
+    console.log('meta+enter, ctrl+enter')
+    event.preventDefault()
+    if (loading) return // Don't execute if already loading
+    
+    if (activeTab === 'query') {
+      executeQuery()
+    } else if (activeTab === 'rpc') {
+      executeRpc()
+    }
+  }, {
+    enableOnFormTags: ['textarea']
+  }, [activeTab, queryCode, rpcCode, useServiceKey, loading])
+
   return (
     <main className='h-screen py-4 flex flex-col'>
       <div className="w-full px-6 flex-shrink-0">
@@ -147,7 +164,7 @@ export default function SupabasePlayground() {
       <div className="flex-1 flex flex-col max-w-5xl lg:max-w-screen mx-6 border shadow-xs rounded-lg my-4 overflow-hidden">
         <section className='flex flex-col lg:flex-row divide-y lg:divide-x lg:divide-y-0 h-full'>
           <div className='w-full px-6 lg:w-1/2 py-4'>
-            <Tabs defaultValue="query" className="w-full">
+            <Tabs defaultValue="query" value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="query">
                   <Braces className="size-4" />
@@ -163,6 +180,7 @@ export default function SupabasePlayground() {
                 <div>
                   <label htmlFor="query-textarea" className="block text-sm font-medium mb-2">
                     Supabase JS Query
+                    <span className="text-muted-foreground text-xs ml-2">(⌘+Enter to run)</span>
                   </label>
                   <Textarea
                     id="query-textarea"
@@ -207,6 +225,7 @@ export default function SupabasePlayground() {
                 <div>
                   <label htmlFor="rpc-textarea" className="block text-sm font-medium mb-2">
                     RPC Function Call
+                    <span className="text-muted-foreground text-xs ml-2">(⌘+Enter to run)</span>
                   </label>
                   <Textarea
                     id="rpc-textarea"

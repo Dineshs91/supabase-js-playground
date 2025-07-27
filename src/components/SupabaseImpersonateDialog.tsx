@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { UserRoundCog, AlertTriangle } from 'lucide-react'
+import { UserRoundCog, AlertTriangle, StopCircle } from 'lucide-react'
 import { createSupabaseAdminClient, supabase, hasServiceKey } from '@/lib/supabase'
 
 interface SupabaseImpersonateDialogProps {
@@ -153,10 +153,10 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
         <Button 
           variant={impersonatedUserFromSession ? "default" : "outline"} 
           size="sm"
-          className={impersonatedUserFromSession ? "bg-orange-600 hover:bg-orange-700" : ""}
+          className={impersonatedUserFromSession ? 'ring-2 ring-gray-300' : ''}
         >
-          <UserRoundCog className="h-4 w-4 mr-2" />
-          {impersonatedUserFromSession ? `Impersonating: ${impersonatedUserFromSession.email}` : 'Impersonate User'}
+          <UserRoundCog className="size-4 text-stone-200" />
+          <p className='max-w-44 truncate'>{impersonatedUserFromSession ? `${impersonatedUserFromSession.email}` : 'Impersonate User'}</p> 
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -251,13 +251,12 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
         <DialogFooter className="gap-2">
           {impersonatedUserFromSession && (
             <Button
-              variant="outline"
               onClick={() => {
                 handleStopImpersonation()
                 setOpen(false)
               }}
-              className="text-orange-600 hover:text-orange-700 border-orange-200 hover:bg-orange-50"
             >
+              <StopCircle className='size-4' />
               Stop Impersonation
             </Button>
           )}
