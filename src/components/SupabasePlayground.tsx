@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { createSupabaseClient, supabase } from '@/lib/supabase'
+import { Switch } from '@/components/ui/switch'
+import { createSupabaseClient, supabase, hasServiceKey } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Input } from './ui/input'
-import { Braces, DatabaseZap, Loader2, Play, SquareFunction } from 'lucide-react'
+import { Braces, DatabaseZap, Loader2, Play, SquareFunction, X, Key, ShieldCheck } from 'lucide-react'
 
 export default function SupabasePlayground() {
   const [queryCode, setQueryCode] = useState('')
@@ -18,30 +19,46 @@ export default function SupabasePlayground() {
   const [results, setResults] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [useServiceKey, setUseServiceKey] = useState(false)
+  const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
+  const [isImpersonating, setIsImpersonating] = useState(false)
 
-  // useEffect(() => {
-  //   const updateCurrentUser = async() => {
-  //     const { data: { session } } = await supabase.auth.getSession()
-  //     setCurrentUser(session?.user || null)
-  //   }
+  useEffect(() => {
+    // Check service key availability and impersonation status
+    const checkKeyAvailability = () => {
+      setServiceKeyAvailable(hasServiceKey())
+    }
     
-  //   // Initial session check
-  //   updateCurrentUser()
+    const checkImpersonationStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setIsImpersonating(!!session?.user)
+    }
     
-  //   // Listen for auth state changes
-  //   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-  //     setCurrentUser(session?.user || null)
-  //   })
+    checkKeyAvailability()
+    checkImpersonationStatus()
     
-  //   return () => subscription.unsubscribe()
-  // }, [])
+    // Listen for auth state changes to detect impersonation
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsImpersonating(!!session?.user)
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const shouldShowKeyToggle = serviceKeyAvailable && !isImpersonating
 
   const handleCredentialsChange = () => {
     setResults(null)
     setError(null)
+    setServiceKeyAvailable(hasServiceKey())
   }
 
   const handleImpersonationChange = () => {
+    setResults(null)
+    setError(null)
+  }
+
+  const clearResults = () => {
     setResults(null)
     setError(null)
   }
@@ -52,7 +69,7 @@ export default function SupabasePlayground() {
     
     try {
       // Create a fresh Supabase client with current credentials
-      const supabase = createSupabaseClient()
+      const supabase = createSupabaseClient(useServiceKey)
       
       // Remove 'await' from the beginning and 'supabase' reference for evaluation
       let code = queryCode.trim()
@@ -79,7 +96,7 @@ export default function SupabasePlayground() {
     
     try {
       // Create a fresh Supabase client with current credentials
-      const supabase = createSupabaseClient()
+      const supabase = createSupabaseClient(useServiceKey)
       
       // Remove 'await' from the beginning and 'supabase' reference for evaluation
       let code = rpcCode.trim()
@@ -143,11 +160,30 @@ export default function SupabasePlayground() {
                 className="font-mono text-sm min-h-32"
               />
             </div>
-            <div className='flex justify-end'>
+            <div className='flex justify-end items-center gap-4'>
+              {shouldShowKeyToggle && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <Key className="size-3" />
+                      <span>Anon</span>
+                    </div>
+                    <Switch
+                      checked={useServiceKey}
+                      onCheckedChange={setUseServiceKey}
+                    />
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <ShieldCheck className="size-3" />
+                      <span>Service</span>
+                    </div>
+                  </div>
+                </div>
+              )}
               <Button 
                 onClick={executeQuery} 
                 disabled={loading}
-                className="w-fit"
+                className="w-32"
+                size="sm"
               >
                 {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
                 <p>{loading ? 'Running...' : 'Run Query'}</p>
@@ -160,19 +196,38 @@ export default function SupabasePlayground() {
               <label htmlFor="rpc-textarea" className="block text-sm font-medium mb-2">
                 RPC Function Call
               </label>
-              <Input
+              <Textarea
                 id="rpc-textarea"
                 value={rpcCode}
                 onChange={(e) => setRpcCode(e.target.value)}
                 placeholder="Enter your RPC function here..."
-                className="font-mono text-sm"
+                className="font-mono text-sm h-32"
               />
             </div>
-            <div className='flex justify-end'>
+            <div className='flex justify-end items-center gap-4'>
+              {shouldShowKeyToggle && (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <Key className="size-3" />
+                      <span>Anon</span>
+                    </div>
+                    <Switch
+                      checked={useServiceKey}
+                      onCheckedChange={setUseServiceKey}
+                    />
+                    <div className="flex items-center gap-1.5 text-xs">
+                      <ShieldCheck className="size-3" />
+                      <span>Service</span>
+                    </div>
+                  </div>
+                </div>
+              )}
               <Button 
                 onClick={executeRpc} 
                 disabled={loading}
-                className="w-fit flex items-center gap-2"
+                className="w-32 flex items-center gap-2"
+                size="sm"
               >
                 {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
                 <p>{loading ? 'Running...' : 'Run RPC'}</p>
@@ -185,10 +240,23 @@ export default function SupabasePlayground() {
       <div className="flex-1 max-w-4xl mx-auto w-full p-6 pt-4 flex flex-col min-h-0">
         <div className="border rounded-lg flex flex-col h-full">
           <div className="flex-shrink-0 p-4 border-b">
-            <h3 className="text-lg font-semibold flex items-center gap-1">
-              <DatabaseZap className="size-4" />
-              <p>Results</p>
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold flex items-center gap-1">
+                <DatabaseZap className="size-4" />
+                <p>Results</p>
+              </h3>
+              {(results || error) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearResults}
+                  className="flex items-center gap-1"
+                >
+                  <X className="size-3" />
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
           
           <div className="flex-1 p-4 overflow-auto">
