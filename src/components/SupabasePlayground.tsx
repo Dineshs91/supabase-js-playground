@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { createSupabaseClient } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
+import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Input } from './ui/input'
 
 export default function SupabasePlayground() {
@@ -16,10 +17,19 @@ export default function SupabasePlayground() {
   const [results, setResults] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null)
 
   // Function to refresh Supabase client when credentials change
   const handleCredentialsChange = () => {
     // Clear any existing results since we're now using different credentials
+    setResults(null)
+    setError(null)
+  }
+
+  // Function to handle impersonation changes
+  const handleImpersonationChange = (userEmail?: string) => {
+    setImpersonatedUser(userEmail || null)
+    // Clear results when impersonation changes
     setResults(null)
     setError(null)
   }
@@ -87,9 +97,17 @@ export default function SupabasePlayground() {
             <h1 className="text-3xl font-bold mb-2">Supabase JS Playground</h1>
             <p className="text-muted-foreground">
               Test your Supabase queries and RPC calls in real-time
+              {impersonatedUser && (
+                <span className="ml-2 text-orange-600 font-medium">
+                  • Impersonating: {impersonatedUser}
+                </span>
+              )}
             </p>
           </div>
-          <SupabaseSettingsDialog onCredentialsChange={handleCredentialsChange} />
+          <div className="flex items-center gap-2">
+            <SupabaseImpersonateDialog onImpersonationChange={handleImpersonationChange} />
+            <SupabaseSettingsDialog onCredentialsChange={handleCredentialsChange} />
+          </div>
         </div>
       </div>
 
