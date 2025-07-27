@@ -144,7 +144,7 @@ export default function SupabasePlayground() {
       <div className="w-full px-6 flex-shrink-0">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
           <div>
-            <h1 className="text-xl font-bold">Supabase JS Playground</h1>
+            <h1 className='text-sm'><span className='text-[#3fcf8e] text-2xl font-bold'>Supabase</span> JS Playground</h1>
             <p className="text-muted-foreground text-sm">
               Test your Supabase queries and RPC calls in real-time
             </p>
@@ -187,7 +187,7 @@ export default function SupabasePlayground() {
                     value={queryCode}
                     onChange={(e) => setQueryCode(e.target.value)}
                     placeholder="Enter your Supabase query here... Example: await supabase.from('characters').select()"
-                    className="font-mono text-sm min-h-16 lg:min-h-32 text-gray-800"
+                    className="font-mono text-sm placeholder:text-xs min-h-16 lg:min-h-32 text-gray-800"
                   />
                 </div>
                 <div className='flex justify-end items-center gap-4'>
@@ -232,7 +232,7 @@ export default function SupabasePlayground() {
                     value={rpcCode}
                     onChange={(e) => setRpcCode(e.target.value)}
                     placeholder="Enter your RPC function name here... Example: get_user_profile"
-                    className="font-mono text-sm h-16 lg:h-32 text-gray-800"
+                    className="font-mono text-sm placeholder:text-xs h-16 lg:h-32 text-gray-800"
                   />
                 </div>
                 <div className='flex justify-end items-center gap-4'>
