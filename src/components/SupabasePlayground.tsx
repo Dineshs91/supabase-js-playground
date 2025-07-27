@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch'
 import { createSupabaseClient, supabase, hasServiceKey } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
-import { Input } from './ui/input'
+import ReactJsonView from '@microlink/react-json-view';
 import { Braces, DatabaseZap, Loader2, Play, SquareFunction, X, Key, ShieldCheck } from 'lucide-react'
 
 export default function SupabasePlayground() {
@@ -201,7 +201,7 @@ export default function SupabasePlayground() {
                     id="rpc-textarea"
                     value={rpcCode}
                     onChange={(e) => setRpcCode(e.target.value)}
-                    placeholder="Enter your RPC function here..."
+                    placeholder="Enter your RPC function name here... Example: get_user_profile"
                     className="font-mono text-sm h-16 lg:h-32 text-gray-800"
                   />
                 </div>
@@ -245,9 +245,9 @@ export default function SupabasePlayground() {
             }}
           >
             <div className="border rounded-lg flex flex-col lg:mt-4 h-[45vh] lg:h-[78vh] bg-white">
-              <div className="flex-shrink-0 px-4 py-2 border-b">
+              <div className="flex-shrink-0 px-4 py-2 border-b shadow-xs">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold flex items-center gap-1">
+                  <h3 className="font-semibold flex items-center gap-1">
                     <DatabaseZap className="size-4" />
                     <p>Results</p>
                   </h3>
@@ -279,22 +279,21 @@ export default function SupabasePlayground() {
                 
                 {results && !loading && !error && (
                   <div className="bg-muted/50 rounded-md p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-medium">Response:</div>
+                    <div className="flex items-center justify-end mb-2">
                       {results.data && Array.isArray(results.data) && (
                         <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
                           {results.data.length} {results.data.length === 1 ? 'result' : 'results'}
                         </div>
                       )}
-                      {results.count !== undefined && (
-                        <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md">
-                          {results.count} {results.count === 1 ? 'result' : 'results'}
-                        </div>
-                      )}
                     </div>
-                    <pre className="text-sm bg-background p-3 rounded border whitespace-pre-wrap break-words">
-                      {JSON.stringify(results, null, 2)}
-                    </pre>
+                    <ReactJsonView 
+                      src={results}
+                      quotesOnKeys={false}
+                      displayArrayKey={false}
+                      displayObjectSize={false}
+                      displayDataTypes={false}
+                      enableClipboard={false}
+                    />
                   </div>
                 )}
                 
