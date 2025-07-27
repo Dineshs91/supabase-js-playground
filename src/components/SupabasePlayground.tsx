@@ -239,13 +239,13 @@ export default function SupabasePlayground() {
           </div>
 
           <div 
-            className="w-full bg-stone-50/20 p-6 lg:pt-0 flex flex-col lg:w-1/2"
+            className="w-full bg-stone-50/20 px-4 lg:pt-0 flex flex-col lg:w-1/2"
             style={{
               backgroundImage: 'repeating-linear-gradient(-50deg, transparent, transparent 7px, rgba(0,0,0,0.04) 7px, rgba(0,0,0,0.04) 8px)'
             }}
           >
-            <div className="border rounded-lg flex flex-col my-4 h-[78vh] bg-white">
-              <div className="flex-shrink-0 p-4 border-b">
+            <div className="border rounded-lg flex flex-col lg:mt-4 h-[45vh] lg:h-[78vh] bg-white">
+              <div className="flex-shrink-0 px-4 py-2 border-b">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold flex items-center gap-1">
                     <DatabaseZap className="size-4" />
@@ -254,7 +254,7 @@ export default function SupabasePlayground() {
                   {(results || error) && (
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="xs"
                       onClick={clearResults}
                       className="flex items-center gap-1"
                     >
