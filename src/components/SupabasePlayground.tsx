@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
@@ -8,8 +9,13 @@ import { Switch } from '@/components/ui/switch'
 import { createSupabaseClient, supabase, hasServiceKey } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
-import ReactJsonView from '@microlink/react-json-view';
 import { Braces, DatabaseZap, Loader2, Play, SquareFunction, X, Key, ShieldCheck } from 'lucide-react'
+
+// Dynamically import ReactJsonView to avoid SSR issues
+const ReactJsonView = dynamic(() => import('@microlink/react-json-view'), {
+  ssr: false,
+  loading: () => <div className="text-muted-foreground text-sm">Loading JSON viewer...</div>
+})
 
 export default function SupabasePlayground() {
   const [queryCode, setQueryCode] = useState('')
@@ -22,9 +28,11 @@ export default function SupabasePlayground() {
   const [useServiceKey, setUseServiceKey] = useState(false)
   const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
   const [isImpersonating, setIsImpersonating] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    // Check service key availability and impersonation status
+    setIsClient(true)
+
     const checkKeyAvailability = () => {
       setServiceKeyAvailable(hasServiceKey())
     }
@@ -68,8 +76,7 @@ export default function SupabasePlayground() {
     setError(null)
     
     try {
-      // Create a fresh Supabase client with current credentials
-      const supabase = createSupabaseClient(useServiceKey)
+      const supabaseClient = createSupabaseClient(useServiceKey)
       
       // Remove 'await' from the beginning and 'supabase' reference for evaluation
       let code = queryCode.trim()
@@ -81,7 +88,7 @@ export default function SupabasePlayground() {
       }
       
       // Execute the query
-      const result = await eval(`supabase${code}`)
+      const result = await eval(`supabaseClient${code}`)
       setResults(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -95,8 +102,7 @@ export default function SupabasePlayground() {
     setError(null)
     
     try {
-      // Create a fresh Supabase client with current credentials
-      const supabase = createSupabaseClient(useServiceKey)
+      const supabaseClient = createSupabaseClient(useServiceKey)
       
       // Remove 'await' from the beginning and 'supabase' reference for evaluation
       let code = rpcCode.trim()
@@ -107,7 +113,7 @@ export default function SupabasePlayground() {
         code = code.substring(8)
       }
 
-      const result = await eval(`supabase.rpc('${code}')`)
+      const result = await eval(`supabaseClient.rpc('${code}')`)
       setResults(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -286,14 +292,14 @@ export default function SupabasePlayground() {
                         </div>
                       )}
                     </div>
-                    <ReactJsonView 
+                    {isClient && <ReactJsonView 
                       src={results}
                       quotesOnKeys={false}
                       displayArrayKey={false}
                       displayObjectSize={false}
                       displayDataTypes={false}
                       enableClipboard={false}
-                    />
+                    />}
                   </div>
                 )}
                 

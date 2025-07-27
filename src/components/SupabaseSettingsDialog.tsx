@@ -72,13 +72,6 @@ export default function SupabaseSettingsDialog({ onCredentialsChange }: Supabase
     }
   }
 
-  const handleClearUrl = () => {
-    localStorage.removeItem('supabase-url')
-    setUrl('')
-    setHasStoredUrl(false)
-    onCredentialsChange()
-  }
-
   const handleClearAnonKey = () => {
     localStorage.removeItem('supabase-anon-key')
     localStorage.removeItem('supabase-key') // Remove legacy key too
@@ -126,7 +119,7 @@ export default function SupabaseSettingsDialog({ onCredentialsChange }: Supabase
         <DialogHeader>
           <DialogTitle>Supabase Configuration</DialogTitle>
           <DialogDescription>
-            Enter your Supabase project URL and API keys. These will be stored in your browser's local storage.
+            Enter your Supabase project URL and API keys. These will be stored in your browser&apos;s local storage.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

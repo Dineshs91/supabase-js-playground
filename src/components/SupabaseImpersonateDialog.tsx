@@ -24,7 +24,6 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null)
   const [impersonatedUserFromSession, setImpersonatedUserFromSession] = useState<any>(null)
   const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
 
@@ -116,9 +115,6 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
         throw new Error(`Failed to set session: ${sessionError.message}`)
       }
       
-      // Store the impersonated user info
-      setImpersonatedUser(email)
-      
       // Notify parent component
       onImpersonationChange(email)
       
@@ -135,7 +131,6 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   const handleStopImpersonation = async () => {
     try {
       await supabase.auth.signOut()
-      setImpersonatedUser(null)
       setImpersonatedUserFromSession(null)
       onImpersonationChange()
     } catch (err) {
