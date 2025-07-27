@@ -150,8 +150,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button 
-          variant={impersonatedUserFromSession ? "default" : "outline"} 
+        <Button
           size="sm"
           className={impersonatedUserFromSession ? 'ring-2 ring-gray-300' : ''}
         >
