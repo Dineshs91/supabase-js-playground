@@ -8,6 +8,7 @@ import { createSupabaseClient, supabase } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Input } from './ui/input'
+import { Braces, DatabaseZap, Loader2, Play, SquareFunction } from 'lucide-react'
 
 export default function SupabasePlayground() {
   const [queryCode, setQueryCode] = useState('')
@@ -17,37 +18,30 @@ export default function SupabasePlayground() {
   const [results, setResults] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null)
-  const [currentUser, setCurrentUser] = useState<any>(null)
 
-  useEffect(() => {
-    const updateCurrentUser = async() => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setCurrentUser(session?.user || null)
-    }
+  // useEffect(() => {
+  //   const updateCurrentUser = async() => {
+  //     const { data: { session } } = await supabase.auth.getSession()
+  //     setCurrentUser(session?.user || null)
+  //   }
     
-    // Initial session check
-    updateCurrentUser()
+  //   // Initial session check
+  //   updateCurrentUser()
     
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setCurrentUser(session?.user || null)
-    })
+  //   // Listen for auth state changes
+  //   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+  //     setCurrentUser(session?.user || null)
+  //   })
     
-    return () => subscription.unsubscribe()
-  }, [])
+  //   return () => subscription.unsubscribe()
+  // }, [])
 
-  // Function to refresh Supabase client when credentials change
   const handleCredentialsChange = () => {
-    // Clear any existing results since we're now using different credentials
     setResults(null)
     setError(null)
   }
 
-  // Function to handle impersonation changes
-  const handleImpersonationChange = (userEmail?: string) => {
-    setImpersonatedUser(userEmail || null)
-    // Clear results when impersonation changes
+  const handleImpersonationChange = () => {
     setResults(null)
     setError(null)
   }
@@ -95,8 +89,7 @@ export default function SupabasePlayground() {
       if (code.startsWith('supabase')) {
         code = code.substring(8)
       }
-      
-      // Execute the RPC call
+
       const result = await eval(`supabase.rpc('${code}')`)
       setResults(result)
     } catch (err) {
@@ -108,7 +101,6 @@ export default function SupabasePlayground() {
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Fixed Header */}
       <div className="flex-shrink-0 max-w-4xl mx-auto w-full p-6 pb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -128,8 +120,14 @@ export default function SupabasePlayground() {
       <div className="flex-shrink-0 max-w-4xl mx-auto w-full px-6">
         <Tabs defaultValue="query" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="query">Database Query</TabsTrigger>
-            <TabsTrigger value="rpc">RPC Function</TabsTrigger>
+            <TabsTrigger value="query">
+              <Braces className="size-4" />
+              <p>Database Query</p>
+            </TabsTrigger>
+            <TabsTrigger value="rpc">
+              <SquareFunction className="size-4" />
+              <p>RPC Function</p>
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="query" className="space-y-4 mt-4">
@@ -145,13 +143,16 @@ export default function SupabasePlayground() {
                 className="font-mono text-sm min-h-32"
               />
             </div>
-            <Button 
-              onClick={executeQuery} 
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? 'Running...' : 'Run Query'}
-            </Button>
+            <div className='flex justify-end'>
+              <Button 
+                onClick={executeQuery} 
+                disabled={loading}
+                className="w-fit"
+              >
+                {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+                <p>{loading ? 'Running...' : 'Run Query'}</p>
+              </Button>
+            </div>
           </TabsContent>
           
           <TabsContent value="rpc" className="space-y-4 mt-4">
@@ -167,22 +168,27 @@ export default function SupabasePlayground() {
                 className="font-mono text-sm"
               />
             </div>
-            <Button 
-              onClick={executeRpc} 
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? 'Running...' : 'Run RPC'}
-            </Button>
+            <div className='flex justify-end'>
+              <Button 
+                onClick={executeRpc} 
+                disabled={loading}
+                className="w-fit flex items-center gap-2"
+              >
+                {loading ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+                <p>{loading ? 'Running...' : 'Run RPC'}</p>
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* Results Section - Scrollable */}
       <div className="flex-1 max-w-4xl mx-auto w-full p-6 pt-4 flex flex-col min-h-0">
         <div className="border rounded-lg flex flex-col h-full">
           <div className="flex-shrink-0 p-4 border-b">
-            <h3 className="text-lg font-semibold">Results</h3>
+            <h3 className="text-lg font-semibold flex items-center gap-1">
+              <DatabaseZap className="size-4" />
+              <p>Results</p>
+            </h3>
           </div>
           
           <div className="flex-1 p-4 overflow-auto">
