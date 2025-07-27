@@ -133,7 +133,7 @@ export default function SupabasePlayground() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col max-w-5xl lg:max-w-screen mx-6 border rounded-lg my-4 overflow-hidden">
+      <div className="flex-1 flex flex-col max-w-5xl lg:max-w-screen mx-6 border shadow-xs rounded-lg my-4 overflow-hidden">
         <section className='flex flex-col lg:flex-row divide-y lg:divide-x lg:divide-y-0 h-full'>
           <div className='w-full px-6 lg:w-1/2 py-4'>
             <Tabs defaultValue="query" className="w-full">
@@ -158,7 +158,7 @@ export default function SupabasePlayground() {
                     value={queryCode}
                     onChange={(e) => setQueryCode(e.target.value)}
                     placeholder="Enter your Supabase query here... Example: await supabase.from('characters').select()"
-                    className="font-mono text-sm min-h-32"
+                    className="font-mono text-sm min-h-32 text-gray-800"
                   />
                 </div>
                 <div className='flex justify-end items-center gap-4'>
@@ -202,7 +202,7 @@ export default function SupabasePlayground() {
                     value={rpcCode}
                     onChange={(e) => setRpcCode(e.target.value)}
                     placeholder="Enter your RPC function here..."
-                    className="font-mono text-sm h-32"
+                    className="font-mono text-sm h-32 text-gray-800"
                   />
                 </div>
                 <div className='flex justify-end items-center gap-4'>
@@ -238,8 +238,13 @@ export default function SupabasePlayground() {
             </Tabs>
           </div>
 
-          <div className="w-full bg-neutral-50/70 p-6 lg:pt-0 flex flex-col lg:w-1/2">
-            <div className="border rounded-lg flex flex-col my-4 h-[78vh] bg-white shadow-xs">
+          <div 
+            className="w-full bg-stone-50/20 p-6 lg:pt-0 flex flex-col lg:w-1/2"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(-50deg, transparent, transparent 7px, rgba(0,0,0,0.04) 7px, rgba(0,0,0,0.04) 8px)'
+            }}
+          >
+            <div className="border rounded-lg flex flex-col my-4 h-[78vh] bg-white">
               <div className="flex-shrink-0 p-4 border-b">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold flex items-center gap-1">
