@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { UserRoundCog } from 'lucide-react'
-import { createSupabaseClient, supabase } from '@/lib/supabase'
+import { UserRoundCog, AlertTriangle } from 'lucide-react'
+import { createSupabaseAdminClient, supabase, hasServiceKey } from '@/lib/supabase'
 
 interface SupabaseImpersonateDialogProps {
   onImpersonationChange: (userEmail?: string) => void
@@ -26,6 +26,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   const [error, setError] = useState<string | null>(null)
   const [impersonatedUser, setImpersonatedUser] = useState<string | null>(null)
   const [impersonatedUserFromSession, setImpersonatedUserFromSession] = useState<any>(null)
+  const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
 
   useEffect(() => {
     const updateUser = async() => {
@@ -35,6 +36,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
     }
 
     updateUser()
+    setServiceKeyAvailable(hasServiceKey())
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setImpersonatedUserFromSession(session?.user || null)
@@ -43,17 +45,29 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
     return () => subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    // Update service key availability when dialog opens
+    if (open) {
+      setServiceKeyAvailable(hasServiceKey())
+    }
+  }, [open])
+
   const handleImpersonate = async () => {
     if (!email) return
+    
+    if (!serviceKeyAvailable) {
+      setError('Service key is required for user impersonation. Please configure your service key in the settings.')
+      return
+    }
     
     setLoading(true)
     setError(null)
     
     try {
-      const supabase = createSupabaseClient()
+      const supabaseAdmin = createSupabaseAdminClient()
       
       // Step 1: Generate a magic link for the user
-      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'magiclink',
         email: email.trim(),
         options: {
@@ -163,6 +177,21 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
           </DialogDescription>
         </DialogHeader>
         
+        {/* Service Key Warning */}
+        {!serviceKeyAvailable && (
+          <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-amber-800">
+                <div className="font-medium">Service Key Required</div>
+                <div className="text-amber-700 mt-1">
+                  You need to configure a Supabase service key in the settings to use impersonation features.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {impersonatedUserFromSession ? (
           // Show current impersonation status and stop button
           <div className="grid gap-4 py-4">
@@ -187,7 +216,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="user@example.com"
                 className="font-mono text-sm"
-                disabled={loading}
+                disabled={loading || !serviceKeyAvailable}
               />
             </div>
             
@@ -212,7 +241,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="user@example.com"
                 className="font-mono text-sm"
-                disabled={loading}
+                disabled={loading || !serviceKeyAvailable}
               />
             </div>
             
@@ -243,7 +272,7 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
             <Button
               type="submit"
               onClick={handleImpersonate}
-              disabled={!email || loading}
+              disabled={!email || loading || !serviceKeyAvailable}
             >
               {loading ? 'Impersonating...' : impersonatedUserFromSession ? 'Switch User' : 'Impersonate User'}
             </Button>
