@@ -5,7 +5,6 @@ const defaultSupabaseUrl = 'https://your-project.supabase.co'
 const defaultSupabaseAnonKey = 'your-anon-key'
 const defaultSupabaseServiceKey = 'your-service-key'
 
-// Function to get credentials from localStorage or use defaults
 export function getSupabaseCredentials() {
   if (typeof window === 'undefined') {
     return { 
@@ -14,7 +13,7 @@ export function getSupabaseCredentials() {
       serviceKey: defaultSupabaseServiceKey
     }
   }
-  
+
   const url = localStorage.getItem('supabase-url') || defaultSupabaseUrl
   const anonKey = localStorage.getItem('supabase-anon-key') || defaultSupabaseAnonKey
   const serviceKey = localStorage.getItem('supabase-service-key') || defaultSupabaseServiceKey
@@ -22,7 +21,6 @@ export function getSupabaseCredentials() {
   return { url, anonKey, serviceKey }
 }
 
-// Function to get legacy key for backwards compatibility
 export function getLegacyKey() {
   if (typeof window === 'undefined') {
     return defaultSupabaseAnonKey
@@ -30,32 +28,32 @@ export function getLegacyKey() {
   return localStorage.getItem('supabase-key') || defaultSupabaseAnonKey
 }
 
-// Function to create Supabase client with anon key (default)
 export function createSupabaseClient(useServiceKey = false) {
   const { url, anonKey, serviceKey } = getSupabaseCredentials()
   const key = useServiceKey ? serviceKey : anonKey
   return createClient(url, key)
 }
 
-// Function to create admin client with service key
 export function createSupabaseAdminClient() {
   const { url, serviceKey } = getSupabaseCredentials()
   return createClient(url, serviceKey)
 }
 
-// Check if service key is available
+export function createSupabaseAnonClient() {
+  const { url, anonKey } = getSupabaseCredentials()
+  return createClient(url, anonKey)
+}
+
 export function hasServiceKey() {
   if (typeof window === 'undefined') return false
   const serviceKey = localStorage.getItem('supabase-service-key')
   return !!(serviceKey && serviceKey !== defaultSupabaseServiceKey)
 }
 
-// Check if anon key is available
 export function hasAnonKey() {
   if (typeof window === 'undefined') return false
   const anonKey = localStorage.getItem('supabase-anon-key')
   return !!(anonKey && anonKey !== defaultSupabaseAnonKey)
 }
 
-// Default export for immediate use (using anon key)
 export const supabase = createSupabaseClient() 

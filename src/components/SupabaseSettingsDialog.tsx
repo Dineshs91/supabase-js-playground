@@ -93,7 +93,6 @@ export default function SupabaseSettingsDialog({ onCredentialsChange }: Supabase
     localStorage.removeItem('supabase-url')
     localStorage.removeItem('supabase-anon-key')
     localStorage.removeItem('supabase-service-key')
-    localStorage.removeItem('supabase-key') // Remove legacy key too
     setUrl('')
     setAnonKey('')
     setServiceKey('')
@@ -275,4 +274,4 @@ export default function SupabaseSettingsDialog({ onCredentialsChange }: Supabase
       </DialogContent>
     </Dialog>
   )
-} 
+}

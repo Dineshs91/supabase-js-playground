@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { UserRoundCog, AlertTriangle, StopCircle } from 'lucide-react'
-import { createSupabaseAdminClient, supabase, hasServiceKey } from '@/lib/supabase'
+import { createSupabaseAdminClient, createSupabaseAnonClient, hasServiceKey } from '@/lib/supabase'
 
 interface SupabaseImpersonateDialogProps {
   onImpersonationChange: (userEmail?: string) => void
@@ -27,10 +27,11 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   const [impersonatedUserFromSession, setImpersonatedUserFromSession] = useState<any>(null)
   const [serviceKeyAvailable, setServiceKeyAvailable] = useState(false)
 
+  const supabase = createSupabaseAnonClient()
+
   useEffect(() => {
     const updateUser = async() => {
       const { data: { session } } = await supabase.auth.getSession()
-      console.log("Session: ", session)
       setImpersonatedUserFromSession(session?.user || null)
     }
 
@@ -45,7 +46,6 @@ export default function SupabaseImpersonateDialog({ onImpersonationChange }: Sup
   }, [])
 
   useEffect(() => {
-    // Update service key availability when dialog opens
     if (open) {
       setServiceKeyAvailable(hasServiceKey())
     }
