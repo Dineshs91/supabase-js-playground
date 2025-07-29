@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Supabase JS playground
 
-## Getting Started
+A free and open source tool to run and debug your Supabase JS client code with real data - no setup, no boilerplate.
 
-First, run the development server:
+Inspired by the SQL playground in the Supabase dashboard, but built for testing Supabase JS client queries directly. Quickly check what your JS client code is going to return, without needing to setup a full fledged app.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Example:**
+You have this `await supabase.from('todos').select()` in your app, you can navigate to the playground, and put in this snippet in the Database Query tab and run the query. You will see what this snippet returns when using the `Anon` key. You can add your service key and toggle to use it and see what using a service key returns (Quite useful when working in the backend). You can also impersonate a user, by clicking on the impersonate user button and providing a user's email. Now the same query will return the data that this user can see.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Features
+✅ Instantly test your client code
+🔐 Check what anon & service key can access
+👤 Impersonate users to debug RLS policies and to see what data can they access
+🧠 Call your RPC functions directly
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**🛡️Note:** Supabase API url and keys are stored in the browsers local storage. No data is stored/sent to our server.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Local setup
 
-## Learn More
+Clone the repository to your local and cd into the directory.
 
-To learn more about Next.js, take a look at the following resources:
+**Install dependencies**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`npm install`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Start local server
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`npm run dev`

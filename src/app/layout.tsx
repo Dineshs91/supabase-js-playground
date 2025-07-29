@@ -25,12 +25,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script
-          src={process.env.NEXT_PUBLIC_ANALYTICS_URL}
-          data-token={process.env.NEXT_PUBLIC_ANALYTICS_TOKEN}
-          async
-        >
-        </script>
+        {
+          process.env.NODE_ENV === 'production' && (
+            <script
+              src={process.env.NEXT_PUBLIC_ANALYTICS_URL}
+              data-token={process.env.NEXT_PUBLIC_ANALYTICS_TOKEN}
+              async
+            >
+            </script>
+          )
+        }
+        
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
