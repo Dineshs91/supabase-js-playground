@@ -5,6 +5,14 @@ const defaultSupabaseUrl = 'https://your-project.supabase.co'
 const defaultSupabaseAnonKey = 'your-anon-key'
 const defaultSupabaseServiceKey = 'your-service-key'
 
+export type SupabaseKeyMode = 'legacy' | 'new'
+
+export function getKeyMode(): SupabaseKeyMode {
+  if (typeof window === 'undefined') return 'legacy'
+  const mode = localStorage.getItem('supabase-key-mode')
+  return mode === 'new' || mode === 'legacy' ? (mode as SupabaseKeyMode) : 'legacy'
+}
+
 export function getSupabaseCredentials() {
   if (typeof window === 'undefined') {
     return { 
@@ -15,6 +23,12 @@ export function getSupabaseCredentials() {
   }
 
   const url = localStorage.getItem('supabase-url') || defaultSupabaseUrl
+  const mode = getKeyMode()
+  if (mode === 'new') {
+    const publishableKey = localStorage.getItem('supabase-publishable-key') || defaultSupabaseAnonKey
+    const secretKey = localStorage.getItem('supabase-secret-key') || defaultSupabaseServiceKey
+    return { url, anonKey: publishableKey, serviceKey: secretKey }
+  }
   const anonKey = localStorage.getItem('supabase-anon-key') || defaultSupabaseAnonKey
   const serviceKey = localStorage.getItem('supabase-service-key') || defaultSupabaseServiceKey
   
@@ -46,14 +60,20 @@ export function createSupabaseAnonClient() {
 
 export function hasServiceKey() {
   if (typeof window === 'undefined') return false
-  const serviceKey = localStorage.getItem('supabase-service-key')
-  return !!(serviceKey && serviceKey !== defaultSupabaseServiceKey)
+  const mode = getKeyMode()
+  const key = mode === 'new'
+    ? localStorage.getItem('supabase-secret-key')
+    : localStorage.getItem('supabase-service-key')
+  return !!(key && key !== defaultSupabaseServiceKey)
 }
 
 export function hasAnonKey() {
   if (typeof window === 'undefined') return false
-  const anonKey = localStorage.getItem('supabase-anon-key')
-  return !!(anonKey && anonKey !== defaultSupabaseAnonKey)
+  const mode = getKeyMode()
+  const key = mode === 'new'
+    ? localStorage.getItem('supabase-publishable-key')
+    : localStorage.getItem('supabase-anon-key')
+  return !!(key && key !== defaultSupabaseAnonKey)
 }
 
 export const supabase = createSupabaseClient() 

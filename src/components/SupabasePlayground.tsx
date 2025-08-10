@@ -6,11 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { createSupabaseClient, supabase, hasServiceKey, hasAnonKey } from '@/lib/supabase'
+import { createSupabaseClient, supabase, hasServiceKey, hasAnonKey, getKeyMode, getSupabaseCredentials } from '@/lib/supabase'
 import SupabaseSettingsDialog from '@/components/SupabaseSettingsDialog'
 import SupabaseImpersonateDialog from '@/components/SupabaseImpersonateDialog'
 import { Braces, DatabaseZap, Loader2, Play, SquareFunction, X, Key, ShieldCheck } from 'lucide-react'
 import { useHotkeys } from 'react-hotkeys-hook';
+import { executeQueryServerAction, executeRpcServerAction } from './server'
 
 // Dynamically import ReactJsonView to avoid SSR issues
 const ReactJsonView = dynamic(() => import('@microlink/react-json-view'), {
@@ -32,6 +33,7 @@ export default function SupabasePlayground() {
   const [isImpersonating, setIsImpersonating] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const [activeTab, setActiveTab] = useState('query')
+  const [keyMode, setKeyMode] = useState<'legacy' | 'new'>(typeof window === 'undefined' ? 'legacy' : getKeyMode())
 
   useEffect(() => {
     setIsClient(true)
@@ -39,6 +41,7 @@ export default function SupabasePlayground() {
     const checkKeyAvailability = () => {
       setServiceKeyAvailable(hasServiceKey())
       setAnonKeyAvailable(hasAnonKey())
+      setKeyMode(getKeyMode())
     }
     
     const checkImpersonationStatus = async () => {
@@ -64,6 +67,7 @@ export default function SupabasePlayground() {
     setError(null)
     setServiceKeyAvailable(hasServiceKey())
     setAnonKeyAvailable(hasAnonKey())
+    setKeyMode(getKeyMode())
   }
 
   const handleImpersonationChange = () => {
@@ -127,16 +131,59 @@ export default function SupabasePlayground() {
     }
   }
 
+  const runQuery = async () => {
+    if (keyMode === 'legacy') {
+      executeQuery()
+    } else {
+      setLoading(true)
+      setError(null)
+      try {
+        const result = await executeQueryServerAction(
+          queryCode,
+          useServiceKey,
+          getSupabaseCredentials()
+        )
+        setResults(result)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  const runRpc = async () => {
+    if (keyMode === 'legacy') {
+      executeRpc()
+    } else {
+      setLoading(true)
+      setError(null)
+      try {
+        const result = await executeRpcServerAction(
+          rpcCode,
+          useServiceKey,
+          getSupabaseCredentials()
+        )
+        setResults(result)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
   // Add keyboard shortcuts for cmd/ctrl + enter
   useHotkeys('meta+enter, ctrl+enter', (event) => {
-    console.log('meta+enter, ctrl+enter')
     event.preventDefault()
     if (loading) return // Don't execute if already loading
-    
+
+    console.log('keyMode', keyMode)
+
     if (activeTab === 'query') {
-      executeQuery()
+      runQuery()
     } else if (activeTab === 'rpc') {
-      executeRpc()
+      runRpc()
     }
   }, {
     enableOnFormTags: ['textarea']
@@ -197,7 +244,7 @@ export default function SupabasePlayground() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1.5 text-xs">
                           <Key className="size-3" />
-                          <span>Anon</span>
+                          <span>{keyMode === 'legacy' ? 'Anon' : 'Publishable'}</span>
                         </div>
                         <Switch
                           checked={useServiceKey}
@@ -205,13 +252,13 @@ export default function SupabasePlayground() {
                         />
                         <div className="flex items-center gap-1.5 text-xs">
                           <ShieldCheck className="size-3" />
-                          <span>Service</span>
+                          <span>{keyMode === 'legacy' ? 'Service' : 'Secret'}</span>
                         </div>
                       </div>
                     </div>
                   )}
                   <Button 
-                    onClick={executeQuery} 
+                    onClick={runQuery} 
                     disabled={loading}
                     className="w-32"
                     size="sm"
@@ -242,7 +289,7 @@ export default function SupabasePlayground() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1.5 text-xs">
                           <Key className="size-3" />
-                          <span>Anon</span>
+                          <span>{keyMode === 'legacy' ? 'Anon' : 'Publishable'}</span>
                         </div>
                         <Switch
                           checked={useServiceKey}
@@ -250,13 +297,13 @@ export default function SupabasePlayground() {
                         />
                         <div className="flex items-center gap-1.5 text-xs">
                           <ShieldCheck className="size-3" />
-                          <span>Service</span>
+                          <span>{keyMode === 'legacy' ? 'Service' : 'Secret'}</span>
                         </div>
                       </div>
                     </div>
                   )}
                   <Button 
-                    onClick={executeRpc} 
+                    onClick={runRpc} 
                     disabled={loading}
                     className="w-32 flex items-center gap-2"
                     size="sm"
