@@ -18,6 +18,7 @@ You can also impersonate a user, by clicking on the impersonate user button and 
 🔐 Check what anon & service key can access <br/>
 👤 Impersonate users to debug RLS policies and to see what data can they access <br/>
 🧠 Call your RPC functions directly <br/>
+🔑 Supports both legacy and new API keys <br/>
 
 **🛡️Note:** Supabase API url and keys are stored in the browsers local storage. No data is stored/sent to our server.
 
